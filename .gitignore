@@ -1,0 +1,15 @@
+# Code and documentation only: no weights, data, features, model archives or run outputs.
+__pycache__/
+*.pyc
+.env*
+weights/
+work/
+runs/
+atlas/
+slides/
+*.tar.gz
+*.safetensors
+*.pt
+*.npz
+*.tif
+*.tiff

@@ -1,0 +1,16 @@
+# Self-contained image for the organizers' faithfulness test, which imports inference.py and calls
+# get_args_parser()/run(args) without app.py. The GC image's own /opt/app/*.py predate that interface (Nov 1), and on
+# GC the model tarball's code/ overrides them through app.py. Here the tarball is baked in at /opt/ml/model and its code
+# also replaces /opt/app/*.py, so `import inference` finds the shipped code with or without PYTHONPATH.
+#
+# Build context: a directory holding the extracted model tarball as model/ (never upload this image to the GC algorithm).
+#   docker build -f Dockerfile.selfcontained -t owl_daintyvision:v41-selfcontained <context>
+ARG BASE=owl_daintyvision:latest
+FROM ${BASE}
+COPY --chown=user:user model /opt/ml/model
+RUN cp /opt/ml/model/code/inference.py /opt/ml/model/code/owl_wsi.py /opt/ml/model/code/owl_mil.py \
+       /opt/ml/model/code/report.py /opt/app/
+ENV PYTHONPATH=/opt/ml/model/code
+# The 40-min encode safety net exists for GC's 59-min job limit. On a GPU slower than ~12 tiles/s it would cut a capped
+# slide short and make the tile set speed-dependent, which fails the notebook's repeat check; the test has no such limit.
+ENV OWL_ENCODE_BUDGET_S=86400

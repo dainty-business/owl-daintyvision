@@ -1,0 +1,11 @@
+# The organizers' faithfulness notebook reads and writes masks with ASAP, whose newest Linux build (2.2 nightly) targets
+# Ubuntu 22.04 / Python 3.10 with NumPy 1.x; our inference image is Ubuntu 24.04 / Python 3.12. This image runs only the notebook's
+# mask side (gen_masks.py); the model side runs in our image (run_masks.py).
+FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip wget ca-certificates libgeos-dev \
+    && wget -q https://github.com/computationalpathologygroup/ASAP/releases/download/ASAP-2.2-%28Nightly%29/ASAP-2.2-Ubuntu2204.deb \
+    && apt-get install -y --no-install-recommends ./ASAP-2.2-Ubuntu2204.deb && rm ASAP-2.2-Ubuntu2204.deb \
+    && rm -rf /var/lib/apt/lists/*
+ENV PYTHONPATH=/opt/ASAP/bin
+RUN pip3 install --no-cache-dir -U pip && pip3 install --no-cache-dir "numpy<2" "pandas<2.3" "opencv-python-headless<4.11" wholeslidedata tqdm

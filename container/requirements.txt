@@ -1,0 +1,11 @@
+numpy
+pillow
+scipy
+matplotlib
+tifffile
+zarr
+imagecodecs
+transformers
+safetensors
+fastapi
+uvicorn
